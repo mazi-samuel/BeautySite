@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Product - BeautyMarket{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Delete Product</h3>
+                </div>
+                <div class="card-body">
+                    <p>Are you sure you want to delete the product <strong>"{{ product.name }}"</strong>?</p>
+                    <p>This action cannot be undone.</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger">Yes, Delete Product</button>
+                            <a href="{% url 'products:seller_dashboard' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} - BeautyMarket{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'community:home' %}">Community</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'community:rooms' %}">Rooms</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'community:room_detail' room.id %}">{{ room.name }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ post.title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>{{ post.title }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        {% if post.user.profile.avatar_url %}
+                        <img src="{{ post.user.profile.avatar_url }}" alt="Avatar" class="rounded-circle me-2" width="40" height="40">
+                        {% else %}
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <strong>{{ post.user.username }}</strong>
+                            <div class="text-muted">{{ post.created_at|date:"M d, Y H:i" }}</div>
+                        </div>
+                    </div>
+                    
+                    {% if post.media_url %}
+                    <div class="mb-3">
+                        <img src="{{ post.media_url }}" alt="Post media" class="img-fluid rounded">
+                    </div>
+                    {% endif %}
+                    
+                    <p>{{ post.content|linebreaks }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Comments Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Comments ({{ messages|length }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="border-bottom pb-3 mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            {% if message.user.profile.avatar_url %}
+                            <img src="{{ message.user.profile.avatar_url }}" alt="Avatar" class="rounded-circle me-2" width="30" height="30">
+                            {% else %}
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
+                                <i class="bi bi-person-fill" style="font-size: 0.7rem;"></i>
+                            </div>
+                            {% endif %}
+                            <div>
+                                <strong>{{ message.user.username }}</strong>
+                                <div class="text-muted">{{ message.created_at|date:"M d, Y H:i" }}</div>
+                            </div>
+                        </div>
+                        
+                        {% if message.media_url %}
+                        <div class="mb-2">
+                            <img src="{{ message.media_url }}" alt="Comment media" class="img-fluid rounded" style="max-height: 200px;">
+                        </div>
+                        {% endif %}
+                        
+                        <p class="mb-0">{{ message.content|linebreaks }}</p>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p>No comments yet. Be the first to comment!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Comment Form -->
+    {% if user.is_authenticated %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Add a Comment</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'community:add_message' post.id %}">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Your Comment</label>
+                            <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="media_url" class="form-label">Media URL (Optional)</label>
+                            <input type="url" class="form-control" id="media_url" name="media_url" placeholder="https://example.com/image.jpg">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Post Comment</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <p class="mb-0">Please <a href="{% url 'accounts:login' %}">sign in</a> to add a comment.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

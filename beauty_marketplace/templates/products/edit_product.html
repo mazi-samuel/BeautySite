@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Product - BeautyMarket{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Edit Product: {{ product.name }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Product Name</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ product.name }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category</label>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="">Select a category</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}" {% if category.id == product.category.id %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price ($)</label>
+                            <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" value="{{ product.price }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label">Quantity</label>
+                            <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="{{ product.quantity }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="5" required>{{ product.description }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Product Images</label>
+                            <div id="image-fields">
+                                {% for image in product.images.all %}
+                                <div class="input-group mb-2">
+                                    <input type="url" class="form-control" name="image_urls" value="{{ image.image_url }}" placeholder="Enter image URL">
+                                    <button class="btn btn-outline-danger remove-image" type="button">Remove</button>
+                                </div>
+                                {% endfor %}
+                                <!-- Add at least one empty field if no images exist -->
+                                {% if not product.images.all %}
+                                <div class="input-group mb-2">
+                                    <input type="url" class="form-control" name="image_urls" placeholder="Enter image URL">
+                                    <button class="btn btn-outline-danger remove-image" type="button">Remove</button>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm" id="add-image">Add Another Image</button>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Update Product</button>
+                            <a href="{% url 'products:seller_dashboard' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const imageFields = document.getElementById('image-fields');
+    const addImageButton = document.getElementById('add-image');
+    
+    // Add image field
+    addImageButton.addEventListener('click', function() {
+        const newField = document.createElement('div');
+        newField.className = 'input-group mb-2';
+        newField.innerHTML = `
+            <input type="url" class="form-control" name="image_urls" placeholder="Enter image URL">
+            <button class="btn btn-outline-danger remove-image" type="button">Remove</button>
+        `;
+        imageFields.appendChild(newField);
+    });
+    
+    // Remove image field
+    imageFields.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-image')) {
+            if (imageFields.children.length > 1) {
+                e.target.parentElement.remove();
+            } else {
+                alert('You must have at least one image.');
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

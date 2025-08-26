@@ -1,0 +1,109 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block page_title %}Product Review - {{ product.name }}{% endblock %}
+
+{% block admin_content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Product Review for {{ product.name }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Product Images:</strong></label>
+                            {% if product.images.all %}
+                            <div id="productImages" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-inner">
+                                    {% for image in product.images.all %}
+                                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                        <img src="{{ image.image_url }}" class="d-block w-100" alt="Product Image">
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% if product.images.count > 1 %}
+                                <button class="carousel-control-prev" type="button" data-bs-target="#productImages" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#productImages" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <p>No images available.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Name:</strong></td>
+                                <td>{{ product.name }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Seller:</strong></td>
+                                <td>{{ product.seller.username }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Price:</strong></td>
+                                <td>${{ product.price }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Quantity:</strong></td>
+                                <td>{{ product.quantity }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Category:</strong></td>
+                                <td>{{ product.category.name }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Submitted:</strong></td>
+                                <td>{{ product.created_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label"><strong>Description:</strong></label>
+                    <div class="border rounded p-3">
+                        {{ product.description|linebreaks }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Review Actions</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="rejection_reason" class="form-label">Rejection Reason (if rejecting)</label>
+                        <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="3" placeholder="Enter reason for rejection..."></textarea>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" name="action" value="approve" class="btn btn-success">Approve Product</button>
+                        <button type="submit" name="action" value="reject" class="btn btn-danger">Reject Product</button>
+                    </div>
+                </form>
+                
+                <div class="mt-3">
+                    <a href="{% url 'admin_panel:product_approval' %}" class="btn btn-secondary w-100">Back to List</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

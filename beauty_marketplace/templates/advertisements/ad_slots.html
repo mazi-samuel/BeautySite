@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Advertisement Slots - BeautyMarket{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1>Advertisement Slots</h1>
+            <p class="lead">Manage advertisement placements on the platform.</p>
+        </div>
+    </div>
+    
+    {% if slots %}
+    <div class="row">
+        {% for slot in slots %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5>{{ slot.slot_name }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ slot.page_location }}</p>
+                    <p class="card-text"><small class="text-muted">{{ slot.dimensions }}</small></p>
+                    
+                    {% if slot.advertisement %}
+                    <div class="border p-2 rounded">
+                        <h6>{{ slot.advertisement.title }}</h6>
+                        <p class="mb-1">{{ slot.advertisement.description|truncatewords:10 }}</p>
+                        <small class="text-muted">
+                            Budget: ${{ slot.advertisement.budget }} | 
+                            Spent: ${{ slot.advertisement.spent }}
+                        </small>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <p class="mb-0">No active advertisement in this slot.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h4>No Advertisement Slots Found</h4>
+                <p>There are currently no advertisement slots configured.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

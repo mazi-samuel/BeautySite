@@ -1,0 +1,91 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block page_title %}KYC Review - {{ kyc.user.username }}{% endblock %}
+
+{% block admin_content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>KYC Review for {{ kyc.user.username }}</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <td><strong>User:</strong></td>
+                        <td>{{ kyc.user.username }} ({{ kyc.user.email }})</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Submitted:</strong></td>
+                        <td>{{ kyc.submitted_at|date:"M d, Y H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Status:</strong></td>
+                        <td>
+                            <span class="badge bg-{% if kyc.status == 'verified' %}success{% elif kyc.status == 'pending' %}warning{% else %}danger{% endif %}">
+                                {{ kyc.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label"><strong>ID Document:</strong></label>
+                            {% if kyc.id_document_url %}
+                            <div class="border rounded p-2">
+                                <img src="{{ kyc.id_document_url }}" alt="ID Document" class="img-fluid">
+                            </div>
+                            <a href="{{ kyc.id_document_url }}" target="_blank" class="btn btn-sm btn-outline-primary mt-2">View Full Size</a>
+                            {% else %}
+                            <p>No ID document provided.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Selfie:</strong></label>
+                            {% if kyc.selfie_url %}
+                            <div class="border rounded p-2">
+                                <img src="{{ kyc.selfie_url }}" alt="Selfie" class="img-fluid">
+                            </div>
+                            <a href="{{ kyc.selfie_url }}" target="_blank" class="btn btn-sm btn-outline-primary mt-2">View Full Size</a>
+                            {% else %}
+                            <p>No selfie provided.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Review Actions</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="rejection_reason" class="form-label">Rejection Reason (if rejecting)</label>
+                        <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="3" placeholder="Enter reason for rejection..."></textarea>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" name="action" value="approve" class="btn btn-success">Approve KYC</button>
+                        <button type="submit" name="action" value="reject" class="btn btn-danger">Reject KYC</button>
+                    </div>
+                </form>
+                
+                <div class="mt-3">
+                    <a href="{% url 'admin_panel:kyc_review' %}" class="btn btn-secondary w-100">Back to List</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

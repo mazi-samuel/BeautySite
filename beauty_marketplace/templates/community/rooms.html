@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Community Rooms - BeautyMarket{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1>Community Rooms</h1>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <form method="get">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="search" placeholder="Search rooms..." value="{{ search_query }}">
+                            <button class="btn btn-outline-secondary" type="submit">Search</button>
+                        </div>
+                    </div>
+                    {% if age_verified %}
+                    <div class="col-md-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="adult_content" name="adult_content" {% if adult_content_filter %}checked{% endif %}>
+                            <label class="form-check-label" for="adult_content">
+                                Show Adult Content
+                            </label>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-3">
+                        <a href="{% url 'community:create_room' %}" class="btn btn-primary w-100">
+                            <i class="bi bi-plus-circle"></i> Create Room
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Rooms List -->
+    <div class="row">
+        <div class="col-12">
+            {% if page_obj %}
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                {% for room in page_obj %}
+                <div class="col">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="card-title">{{ room.name }}</h5>
+                                <div>
+                                    {% if room.is_private %}
+                                    <span class="badge bg-secondary">Private</span>
+                                    {% endif %}
+                                    {% if room.is_adult_content %}
+                                    <span class="badge bg-danger">18+</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <p class="card-text">{{ room.description|truncatewords:20 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    {{ room.posts.count }} posts | 
+                                    Created by {{ room.created_by.username }}
+                                </small>
+                                <a href="{% url 'community:room_detail' room.id %}" class="btn btn-primary btn-sm">View Room</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <nav aria-label="Room pagination">
+                <ul class="pagination justify-content-center mt-4">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if adult_content_filter %}&adult_content=on{% endif %}">Previous</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if adult_content_filter %}&adult_content=on{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if adult_content_filter %}&adult_content=on{% endif %}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-chat" style="font-size: 5rem; color: #ccc;"></i>
+                <h3 class="mt-3">No rooms found</h3>
+                <p class="text-muted">There are no rooms matching your search criteria.</p>
+                <a href="{% url 'community:home' %}" class="btn btn-primary">View All Rooms</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

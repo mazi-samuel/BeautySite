@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit KYC Documents - BeautyMarket{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">Submit KYC Documents</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5>Why KYC Verification?</h5>
+                        <p>KYC (Know Your Customer) verification helps us ensure the security of our platform and build trust between buyers and sellers. 
+                        Once verified, you'll be able to sell products and access additional features.</p>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="id_document_url" class="form-label">ID Document</label>
+                            <input type="url" class="form-control" id="id_document_url" name="id_document_url" placeholder="Enter URL of your ID document">
+                            <div class="form-text">Upload a clear photo of your government-issued ID (passport, driver's license, etc.)</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="selfie_url" class="form-label">Selfie with ID</label>
+                            <input type="url" class="form-control" id="selfie_url" name="selfie_url" placeholder="Enter URL of your selfie">
+                            <div class="form-text">Upload a selfie of you holding your ID document</div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Submit for Verification</button>
+                        </div>
+                    </form>
+                    
+                    <div class="mt-4">
+                        <h5>Document Requirements:</h5>
+                        <ul>
+                            <li>Clear, high-quality images</li>
+                            <li>All information must be visible and readable</li>
+                            <li>ID must not be expired</li>
+                            <li>Selfie must clearly show your face and the ID</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

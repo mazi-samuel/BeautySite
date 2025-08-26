@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - BeautyMarket{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Profile Picture</h5>
+                </div>
+                <div class="card-body text-center">
+                    {% if profile.avatar_url %}
+                        <img src="{{ profile.avatar_url }}" alt="Avatar" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 150px; height: 150px; margin: 0 auto;">
+                            <i class="bi bi-person-fill" style="font-size: 4rem;"></i>
+                        </div>
+                    {% endif %}
+                    <a href="{% url 'accounts:upload_avatar' %}" class="btn btn-primary">Change Avatar</a>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Account Information</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Username:</strong> {{ user.username }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Phone:</strong> {{ user.phone }}</p>
+                    <p><strong>User Type:</strong> {{ user.get_user_type_display }}</p>
+                    <p><strong>Member Since:</strong> {{ user.date_joined|date:"F d, Y" }}</p>
+                    <a href="{% url 'accounts:change_password' %}" class="btn btn-secondary">Change Password</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Profile Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="display_name" class="form-label">Display Name</label>
+                            <input type="text" class="form-control" id="display_name" name="display_name" value="{{ profile.display_name }}">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="bio" class="form-label">Bio</label>
+                            <textarea class="form-control" id="bio" name="bio" rows="4">{{ profile.bio }}</textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Verification Status</h5>
+                </div>
+                <div class="card-body">
+                    {% if user.kyc.status == 'verified' %}
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle-fill"></i> Your account is verified
+                        </div>
+                    {% elif user.kyc.status == 'pending' %}
+                        <div class="alert alert-warning">
+                            <i class="bi bi-clock-fill"></i> Your verification is pending review
+                        </div>
+                    {% elif user.kyc.status == 'rejected' %}
+                        <div class="alert alert-danger">
+                            <i class="bi bi-x-circle-fill"></i> Your verification was rejected: {{ user.kyc.rejection_reason }}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle-fill"></i> Your account is not verified
+                        </div>
+                    {% endif %}
+                    
+                    <a href="{% url 'accounts:kyc_submit' %}" class="btn btn-primary">Submit KYC Documents</a>
+                    <a href="{% url 'accounts:kyc_status' %}" class="btn btn-outline-primary">View KYC Status</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

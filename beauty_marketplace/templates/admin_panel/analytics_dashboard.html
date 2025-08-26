@@ -1,0 +1,152 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block page_title %}Analytics Dashboard{% endblock %}
+
+{% block admin_content %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>Analytics Dashboard</h5>
+    </div>
+    <div class="card-body">
+        <!-- Filters -->
+        <form method="get" class="mb-4">
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="period" class="form-label">Period</label>
+                    <select name="period" id="period" class="form-select">
+                        <option value="day" {% if period_filter == 'day' %}selected{% endif %}>Daily</option>
+                        <option value="week" {% if period_filter == 'week' %}selected{% endif %}>Weekly</option>
+                        <option value="month" {% if period_filter == 'month' %}selected{% endif %}>Monthly</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">&nbsp;</label>
+                    <div>
+                        <button type="submit" class="btn btn-primary w-100">Update</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Revenue Chart -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6>Revenue Overview</h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="revenueChart" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Signups Chart -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6>User Signups</h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="signupChart" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Key Metrics -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card text-white bg-primary mb-3">
+                    <div class="card-header">Total Users</div>
+                    <div class="card-body">
+                        <h5 class="card-title">1,245</h5>
+                        <p class="card-text"><small>+12% from last month</small></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-success mb-3">
+                    <div class="card-header">Total Products</div>
+                    <div class="card-body">
+                        <h5 class="card-title">3,421</h5>
+                        <p class="card-text"><small>+8% from last month</small></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-warning mb-3">
+                    <div class="card-header">Total Orders</div>
+                    <div class="card-body">
+                        <h5 class="card-title">876</h5>
+                        <p class="card-text"><small>+15% from last month</small></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-info mb-3">
+                    <div class="card-header">Total Revenue</div>
+                    <div class="card-body">
+                        <h5 class="card-title">$45,678</h5>
+                        <p class="card-text"><small>+22% from last month</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Revenue Chart
+const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+const revenueChart = new Chart(revenueCtx, {
+    type: 'line',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+            label: 'Revenue',
+            data: [12000, 19000, 15000, 18000, 22000, 25000],
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Signup Chart
+const signupCtx = document.getElementById('signupChart').getContext('2d');
+const signupChart = new Chart(signupCtx, {
+    type: 'bar',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+            label: 'User Signups',
+            data: [120, 190, 150, 180, 220, 250],
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}Order {{ order.order_number }} - BeautyMarket{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1>Order Details</h1>
+            <p class="text-muted">Order #{{ order.order_number }}</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Order Items</h5>
+                </div>
+                <div class="card-body">
+                    {% for item in order_items %}
+                    <div class="row mb-3 pb-3 border-bottom">
+                        <div class="col-md-2">
+                            {% if item.product.images.all %}
+                            <img src="{{ item.product.images.first.image_url }}" alt="{{ item.product.name }}" class="img-fluid">
+                            {% else %}
+                            <div class="bg-light" style="height: 80px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-image" style="font-size: 2rem; color: #ccc;"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-5">
+                            <h6><a href="{% url 'products:product_detail' item.product.id %}">{{ item.product.name }}</a></h6>
+                            <p class="text-muted">{{ item.product.category.name }}</p>
+                        </div>
+                        <div class="col-md-2">
+                            <strong>Qty: {{ item.quantity }}</strong>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>${{ item.total_price }}</strong>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5>Order Status History</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        {% for status in order_status_history %}
+                        <div class="timeline-item">
+                            <div class="timeline-badge bg-{% if status.status == 'delivered' %}success{% elif status.status == 'shipped' %}primary{% elif status.status == 'processing' %}warning{% elif status.status == 'cancelled' %}danger{% else %}secondary{% endif %}"></div>
+                            <div class="timeline-panel">
+                                <div class="timeline-heading">
+                                    <h6 class="timeline-title">{{ status.get_status_display }}</h6>
+                                    <p class="text-muted mb-0"><small>{{ status.created_at|date:"M d, Y H:i" }}</small></p>
+                                </div>
+                                {% if status.notes %}
+                                <div class="timeline-body">
+                                    <p>{{ status.notes }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <strong>${{ order.total_amount }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping:</span>
+                        <strong>Free</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Tax:</span>
+                        <strong>$0.00</strong>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Total:</h5>
+                        <h5>${{ order.total_amount }}</h5>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Delivery Information</h5>
+                </div>
+                <div class="card-body">
+                    <p>{{ order.delivery_address|linebreaks }}</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5>Order Information</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Order Number:</strong> {{ order.order_number }}</p>
+                    <p><strong>Order Date:</strong> {{ order.created_at|date:"M d, Y H:i" }}</p>
+                    <p><strong>Status:</strong> 
+                        <span class="badge bg-{% if order.status == 'delivered' %}success{% elif order.status == 'shipped' %}primary{% elif order.status == 'processing' %}warning{% elif order.status == 'cancelled' %}danger{% else %}secondary{% endif %}">
+                            {{ order.get_status_display }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding: 20px 0 20px;
+    list-style: none;
+}
+
+.timeline:before {
+    content: " ";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 20px;
+    width: 2px;
+    margin-left: -1px;
+    background-color: #e9ecef;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-badge {
+    position: absolute;
+    top: 0;
+    left: 20px;
+    width: 20px;
+    height: 20px;
+    margin-left: -10px;
+    border-radius: 50% !important;
+}
+
+.timeline-panel {
+    margin-left: 50px;
+}
+</style>
+{% endblock %}

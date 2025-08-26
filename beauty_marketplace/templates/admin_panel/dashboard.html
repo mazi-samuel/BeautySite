@@ -1,0 +1,94 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block page_title %}Admin Dashboard{% endblock %}
+
+{% block admin_content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-header">Total Users</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ total_users }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-header">Total Products</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ total_products }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-header">Total Orders</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ total_orders }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-header">Total Revenue</div>
+            <div class="card-body">
+                <h5 class="card-title">${{ total_revenue }}</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Recent Reports</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_reports %}
+                <div class="list-group">
+                    {% for report in recent_reports %}
+                    <a href="{% url 'admin_panel:handle_report' report.id %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ report.get_report_type_display }} Report</h6>
+                            <small>{{ report.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        <p class="mb-1">{{ report.description|truncatewords:10 }}</p>
+                        <small>Reported by {{ report.reported_by.username }}</small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p>No recent reports.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Recent User Signups</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_signups %}
+                <div class="list-group">
+                    {% for user in recent_signups %}
+                    <a href="{% url 'admin_panel:user_detail' user.id %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ user.username }}</h6>
+                            <small>{{ user.date_joined|date:"M d, Y" }}</small>
+                        </div>
+                        <p class="mb-1">{{ user.email }}</p>
+                        <small>User type: {{ user.get_user_type_display }}</small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p>No recent signups.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

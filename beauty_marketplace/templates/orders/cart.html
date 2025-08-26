@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Shopping Cart - BeautyMarket{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1>Shopping Cart</h1>
+        </div>
+    </div>
+    
+    {% if cart_items %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Items in Your Cart ({{ item_count }})</h5>
+                </div>
+                <div class="card-body">
+                    {% for item in cart_items %}
+                    <div class="row mb-3 pb-3 border-bottom">
+                        <div class="col-md-2">
+                            {% if item.product.images.all %}
+                            <img src="{{ item.product.images.first.image_url }}" alt="{{ item.product.name }}" class="img-fluid">
+                            {% else %}
+                            <div class="bg-light" style="height: 80px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-image" style="font-size: 2rem; color: #ccc;"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-5">
+                            <h6><a href="{% url 'products:product_detail' item.product.id %}">{{ item.product.name }}</a></h6>
+                            <p class="text-muted">{{ item.product.category.name }}</p>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="input-group" style="width: 120px;">
+                                <form method="post" action="{% url 'orders:update_cart_item' item.id %}">
+                                    {% csrf_token %}
+                                    <input type="number" class="form-control form-control-sm text-center" name="quantity" value="{{ item.quantity }}" min="1">
+                                    <button class="btn btn-outline-primary btn-sm" type="submit">Update</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <strong>${{ item.total_price }}</strong>
+                        </div>
+                        <div class="col-md-1">
+                            <form method="post" action="{% url 'orders:remove_from_cart' item.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Remove">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <strong>${{ subtotal }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping:</span>
+                        <strong>Free</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Tax:</span>
+                        <strong>$0.00</strong>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Total:</h5>
+                        <h5>${{ subtotal }}</h5>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'orders:checkout' %}" class="btn btn-primary btn-lg">Proceed to Checkout</a>
+                        <form method="post" action="{% url 'orders:clear_cart' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-secondary">Clear Cart</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="bi bi-cart-x" style="font-size: 5rem; color: #ccc;"></i>
+                <h3 class="mt-3">Your cart is empty</h3>
+                <p class="text-muted">Looks like you haven't added anything to your cart yet.</p>
+                <a href="{% url 'products:product_list' %}" class="btn btn-primary">Continue Shopping</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

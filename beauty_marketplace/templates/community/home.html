@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Community - BeautyMarket{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1>Beauty Community</h1>
+            <p class="lead">Connect with other beauty enthusiasts, share tips, and discover new products.</p>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Public Rooms</h5>
+                </div>
+                <div class="card-body">
+                    {% if public_rooms %}
+                    <div class="list-group">
+                        {% for room in public_rooms %}
+                        <a href="{% url 'community:room_detail' room.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="mb-1">{{ room.name }}</h6>
+                                {% if room.is_adult_content %}
+                                <span class="badge bg-danger">18+</span>
+                                {% endif %}
+                            </div>
+                            <p class="mb-1">{{ room.description|truncatewords:15 }}</p>
+                            <small class="text-muted">
+                                {{ room.posts.count }} posts | 
+                                Created by {{ room.created_by.username }}
+                            </small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p>No public rooms available yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            {% if user.is_authenticated %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Your Rooms</h5>
+                </div>
+                <div class="card-body">
+                    {% if user_rooms %}
+                    <div class="list-group">
+                        {% for room in user_rooms %}
+                        <a href="{% url 'community:room_detail' room.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="mb-1">{{ room.name }}</h6>
+                                {% if room.is_private %}
+                                <span class="badge bg-secondary">Private</span>
+                                {% endif %}
+                                {% if room.is_adult_content %}
+                                <span class="badge bg-danger">18+</span>
+                                {% endif %}
+                            </div>
+                            <p class="mb-1">{{ room.description|truncatewords:15 }}</p>
+                            <small class="text-muted">
+                                {{ room.posts.count }} posts
+                            </small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p>You haven't created any rooms yet.</p>
+                    {% endif %}
+                    
+                    <div class="mt-3">
+                        <a href="{% url 'community:create_room' %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> Create New Room
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5>Private Messages</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'community:private_messages' %}" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-chat-dots"></i> View Messages
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <div class="card">
+                <div class="card-header">
+                    <h5>Join the Community</h5>
+                </div>
+                <div class="card-body">
+                    <p>Sign in to create rooms, participate in discussions, and connect with other members.</p>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-primary">Sign In</a>
+                    <a href="{% url 'accounts:register' %}" class="btn btn-outline-primary">Create Account</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

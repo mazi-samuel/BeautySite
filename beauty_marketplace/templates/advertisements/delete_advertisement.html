@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete {{ ad.title }} - BeautyMarket{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Delete Advertisement</h3>
+                </div>
+                <div class="card-body">
+                    <p>Are you sure you want to delete the advertisement <strong>"{{ ad.title }}"</strong>?</p>
+                    
+                    <div class="border p-3 rounded mb-3">
+                        <h5>{{ ad.title }}</h5>
+                        <p>{{ ad.description|truncatewords:20 }}</p>
+                        <div class="d-flex justify-content-between">
+                            <span>Budget: ${{ ad.budget }}</span>
+                            <span>Status: 
+                                <span class="badge bg-{% if ad.status == 'active' %}success{% elif ad.status == 'draft' %}secondary{% elif ad.status == 'paused' %}warning{% else %}danger{% endif %}">
+                                    {{ ad.get_status_display }}
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <p class="text-danger"><strong>Warning:</strong> This action cannot be undone.</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger">Yes, Delete Advertisement</button>
+                            <a href="{% url 'advertisements:advertisement_detail' ad.id %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

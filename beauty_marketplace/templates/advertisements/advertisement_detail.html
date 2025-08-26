@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ ad.title }} - BeautyMarket{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'advertisements:advertisement_management' %}">Advertisements</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ ad.title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>{{ ad.title }}</h1>
+                <div>
+                    <span class="badge bg-{% if ad.status == 'active' %}success{% elif ad.status == 'draft' %}secondary{% elif ad.status == 'paused' %}warning{% else %}danger{% endif %}">
+                        {{ ad.get_status_display }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Advertisement Details</h5>
+                </div>
+                <div class="card-body">
+                    {% if ad.image_url %}
+                    <div class="mb-3">
+                        <img src="{{ ad.image_url }}" alt="{{ ad.title }}" class="img-fluid rounded">
+                    </div>
+                    {% endif %}
+                    
+                    <p>{{ ad.description|linebreaks }}</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Budget Information</h6>
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>Budget:</span>
+                                    <strong>${{ ad.budget }}</strong>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>Spent:</span>
+                                    <strong>${{ ad.spent }}</strong>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>Remaining:</span>
+                                    <strong>${{ ad.budget|floatformat:2|add:"-0.00"|add:ad.spent|floatformat:2 }}</strong>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Schedule</h6>
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    <strong>Start Date:</strong> {{ ad.start_date|date:"M d, Y" }}
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>End Date:</strong> {{ ad.end_date|date:"M d, Y" }}
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Duration:</strong> {{ ad.start_date|timesince:ad.end_date }} days
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'advertisements:edit_advertisement' ad.id %}" class="btn btn-primary">Edit Advertisement</a>
+                        <a href="{% url 'advertisements:delete_advertisement' ad.id %}" class="btn btn-outline-danger">Delete Advertisement</a>
+                        
+                        {% if ad.status == 'draft' %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="approve">
+                            <button type="submit" class="btn btn-success">Approve & Activate</button>
+                        </form>
+                        {% elif ad.status == 'active' %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="reject">
+                            <button type="submit" class="btn btn-warning">Pause Advertisement</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5>Advertisement Slots</h5>
+                </div>
+                <div class="card-body">
+                    {% if ad.slots.all %}
+                    <ul class="list-group">
+                        {% for slot in ad.slots.all %}
+                        <li class="list-group-item">
+                            <strong>{{ slot.slot_name }}</strong>
+                            <div class="text-muted">{{ slot.page_location }}</div>
+                            <div class="text-muted">{{ slot.dimensions }}</div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted">This advertisement is not assigned to any slots.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

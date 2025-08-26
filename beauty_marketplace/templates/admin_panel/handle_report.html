@@ -1,0 +1,94 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block page_title %}Handle Report{% endblock %}
+
+{% block admin_content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Report Details</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <td><strong>Report Type:</strong></td>
+                        <td>{{ report.get_report_type_display }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Reported By:</strong></td>
+                        <td>{{ report.reported_by.username }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Reason:</strong></td>
+                        <td>{{ report.get_report_reason_display }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Submitted:</strong></td>
+                        <td>{{ report.created_at|date:"M d, Y H:i" }}</td>
+                    </tr>
+                </table>
+                
+                <div class="mb-3">
+                    <label class="form-label"><strong>Description:</strong></label>
+                    <div class="border rounded p-3">
+                        {{ report.description }}
+                    </div>
+                </div>
+                
+                <!-- Display the reported content -->
+                {% if report.report_type == 'post' %}
+                <div class="mb-3">
+                    <label class="form-label"><strong>Reported Post:</strong></label>
+                    <div class="border rounded p-3">
+                        <h6>{{ report.post.title }}</h6>
+                        <p>{{ report.post.content }}</p>
+                        {% if report.post.media_url %}
+                        <img src="{{ report.post.media_url }}" alt="Post Media" class="img-fluid">
+                        {% endif %}
+                    </div>
+                </div>
+                {% elif report.report_type == 'message' %}
+                <div class="mb-3">
+                    <label class="form-label"><strong>Reported Message:</strong></label>
+                    <div class="border rounded p-3">
+                        <p>{{ report.message.content }}</p>
+                        {% if report.message.media_url %}
+                        <img src="{{ report.message.media_url }}" alt="Message Media" class="img-fluid">
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Moderation Actions</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes (optional)</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Add any notes about this action..."></textarea>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" name="action" value="remove" class="btn btn-danger">Remove Content</button>
+                        <button type="submit" name="action" value="warn" class="btn btn-warning">Send Warning</button>
+                        <button type="submit" name="action" value="ban" class="btn btn-dark">Ban User</button>
+                    </div>
+                </form>
+                
+                <div class="mt-3">
+                    <a href="{% url 'admin_panel:community_moderation' %}" class="btn btn-secondary w-100">Back to List</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

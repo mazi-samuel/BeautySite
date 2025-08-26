@@ -1,0 +1,126 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block page_title %}User Detail - {{ user.username }}{% endblock %}
+
+{% block admin_content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>User Information</h5>
+            </div>
+            <div class="card-body">
+                {% if user.profile.avatar_url %}
+                <img src="{{ user.profile.avatar_url }}" alt="Avatar" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                {% else %}
+                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 150px; height: 150px; margin: 0 auto;">
+                    <i class="bi bi-person-fill" style="font-size: 4rem;"></i>
+                </div>
+                {% endif %}
+                
+                <table class="table table-borderless">
+                    <tr>
+                        <td><strong>Username:</strong></td>
+                        <td>{{ user.username }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Email:</strong></td>
+                        <td>{{ user.email }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phone:</strong></td>
+                        <td>{{ user.phone }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>User Type:</strong></td>
+                        <td>{{ user.get_user_type_display }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Status:</strong></td>
+                        <td>
+                            {% if user.is_active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Joined:</strong></td>
+                        <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                    </tr>
+                </table>
+                
+                <a href="{% url 'admin_panel:toggle_user_status' user.id %}" class="btn btn-{% if user.is_active %}danger{% else %}success{% endif %} w-100">
+                    {% if user.is_active %}Suspend{% else %}Activate{% endif %} User
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>KYC Information</h5>
+            </div>
+            <div class="card-body">
+                {% if kyc %}
+                <table class="table table-borderless">
+                    <tr>
+                        <td><strong>Status:</strong></td>
+                        <td>
+                            <span class="badge bg-{% if kyc.status == 'verified' %}success{% elif kyc.status == 'pending' %}warning{% else %}danger{% endif %}">
+                                {{ kyc.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Submitted:</strong></td>
+                        <td>{{ kyc.submitted_at|date:"M d, Y H:i" }}</td>
+                    </tr>
+                    {% if kyc.reviewed_at %}
+                    <tr>
+                        <td><strong>Reviewed:</strong></td>
+                        <td>{{ kyc.reviewed_at|date:"M d, Y H:i" }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if kyc.rejection_reason %}
+                    <tr>
+                        <td><strong>Rejection Reason:</strong></td>
+                        <td>{{ kyc.rejection_reason }}</td>
+                    </tr>
+                    {% endif %}
+                </table>
+                
+                {% if kyc.id_document_url %}
+                <div class="mb-3">
+                    <label class="form-label"><strong>ID Document:</strong></label>
+                    <br>
+                    <a href="{{ kyc.id_document_url }}" target="_blank">View ID Document</a>
+                </div>
+                {% endif %}
+                
+                {% if kyc.selfie_url %}
+                <div class="mb-3">
+                    <label class="form-label"><strong>Selfie:</strong></label>
+                    <br>
+                    <a href="{{ kyc.selfie_url }}" target="_blank">View Selfie</a>
+                </div>
+                {% endif %}
+                {% else %}
+                <p>No KYC information available.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5>User Activity</h5>
+            </div>
+            <div class="card-body">
+                <p>Activity log would be displayed here in a real implementation.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

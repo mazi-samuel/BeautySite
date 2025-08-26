@@ -1,0 +1,126 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block page_title %}Advertisement Detail - {{ ad.title }}{% endblock %}
+
+{% block admin_content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Advertisement: {{ ad.title }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Ad Image:</strong></label>
+                            {% if ad.image_url %}
+                            <div class="border rounded p-2">
+                                <img src="{{ ad.image_url }}" alt="Ad Image" class="img-fluid">
+                            </div>
+                            <a href="{{ ad.image_url }}" target="_blank" class="btn btn-sm btn-outline-primary mt-2">View Full Size</a>
+                            {% else %}
+                            <p>No image available.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Created By:</strong></td>
+                                <td>{{ ad.created_by.username }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Status:</strong></td>
+                                <td>
+                                    <span class="badge bg-{% if ad.status == 'active' %}success{% elif ad.status == 'draft' %}secondary{% elif ad.status == 'paused' %}warning{% else %}danger{% endif %}">
+                                        {{ ad.get_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Budget:</strong></td>
+                                <td>${{ ad.budget }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Spent:</strong></td>
+                                <td>${{ ad.spent }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Start Date:</strong></td>
+                                <td>{{ ad.start_date|date:"M d, Y" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>End Date:</strong></td>
+                                <td>{{ ad.end_date|date:"M d, Y" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label"><strong>Description:</strong></label>
+                    <div class="border rounded p-3">
+                        {{ ad.description|linebreaks }}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label"><strong>Target URL:</strong></label>
+                    <div class="border rounded p-3">
+                        <a href="{{ ad.target_url }}" target="_blank">{{ ad.target_url }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Ad Slots</h5>
+            </div>
+            <div class="card-body">
+                {% if ad.slots.all %}
+                <div class="list-group">
+                    {% for slot in ad.slots.all %}
+                    <div class="list-group-item">
+                        <h6>{{ slot.slot_name }}</h6>
+                        <p class="mb-1">Location: {{ slot.page_location }}</p>
+                        <p class="mb-1">Dimensions: {{ slot.dimensions }}</p>
+                        <p class="mb-0">Price per impression: ${{ slot.price_per_impression }}</p>
+                        <p class="mb-0">Price per click: ${{ slot.price_per_click }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p>No ad slots assigned.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Actions</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="d-grid gap-2">
+                        {% if ad.status == 'draft' %}
+                        <button type="submit" name="action" value="approve" class="btn btn-success">Approve Ad</button>
+                        {% else %}
+                        <button type="submit" name="action" value="reject" class="btn btn-danger">Reject Ad</button>
+                        {% endif %}
+                    </div>
+                </form>
+                
+                <div class="mt-3">
+                    <a href="{% url 'admin_panel:advertisement_management' %}" class="btn btn-secondary w-100">Back to List</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
